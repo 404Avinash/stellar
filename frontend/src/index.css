@@ -1,0 +1,129 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Space+Grotesk:wght@400;600;700&display=swap');
+
+/* ── Global Reset & Base ──────────────────────────── */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg:         #060810;
+  --surface:    #0d1020;
+  --surface2:   #131629;
+  --border:     #1e2340;
+  --border-glow:#6c63ff44;
+  --text:       #e8eaf6;
+  --text-dim:   #6b7094;
+  --accent:     #7c6eff;
+  --accent2:    #b79fff;
+  --accent3:    #ff6ef7;
+  --green:      #00ffa3;
+  --green-dim:  #00ffa322;
+  --red:        #ff5f7e;
+  --red-dim:    #ff5f7e22;
+  --yellow:     #ffd166;
+  --radius:     14px;
+  --shadow:     0 8px 40px rgba(0,0,0,.6);
+  --glow-purple:0 0 20px rgba(124,110,255,.35), 0 0 60px rgba(124,110,255,.15);
+  --glow-green: 0 0 20px rgba(0,255,163,.3), 0 0 60px rgba(0,255,163,.1);
+  --glow-red:   0 0 20px rgba(255,95,126,.3), 0 0 60px rgba(255,95,126,.1);
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: .15; transform: scale(1); }
+  50%       { opacity: .8;  transform: scale(1.4); }
+}
+@keyframes drift {
+  0%   { transform: translateY(0px) translateX(0px); }
+  33%  { transform: translateY(-8px) translateX(4px); }
+  66%  { transform: translateY(4px) translateX(-6px); }
+  100% { transform: translateY(0px) translateX(0px); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+@keyframes pulse-ring {
+  0%   { transform: scale(.9); opacity: 1; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes gradient-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes border-glow {
+  0%, 100% { border-color: #6c63ff44; box-shadow: 0 0 10px #6c63ff22; }
+  50%      { border-color: #b79fff88; box-shadow: 0 0 25px #b79fff44; }
+}
+@keyframes count-in {
+  from { opacity: 0; transform: scale(.6); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+html { font-size: 15px; }
+
+body {
+  font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Animated starfield */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 10% 15%, #fff 0, transparent 100%),
+    radial-gradient(1px 1px at 25% 40%, #a78bfa 0, transparent 100%),
+    radial-gradient(1.5px 1.5px at 40% 10%, #fff 0, transparent 100%),
+    radial-gradient(1px 1px at 55% 65%, #7c6eff 0, transparent 100%),
+    radial-gradient(1.5px 1.5px at 70% 25%, #fff 0, transparent 100%),
+    radial-gradient(1px 1px at 80% 75%, #a78bfa 0, transparent 100%),
+    radial-gradient(1px 1px at 90% 50%, #fff 0, transparent 100%),
+    radial-gradient(1px 1px at 15% 80%, #fff 0, transparent 100%),
+    radial-gradient(2px 2px at 60% 88%, #7c6eff 0, transparent 100%),
+    radial-gradient(1px 1px at 35% 55%, #fff 0, transparent 100%),
+    radial-gradient(1px 1px at 50% 30%, #a78bfa 0, transparent 100%),
+    radial-gradient(1.5px 1.5px at 85% 20%, #fff 0, transparent 100%),
+    radial-gradient(1px 1px at 5% 45%, #fff 0, transparent 100%),
+    radial-gradient(1px 1px at 95% 85%, #a78bfa 0, transparent 100%),
+    radial-gradient(1px 1px at 20% 95%, #fff 0, transparent 100%);
+  opacity: .45;
+  pointer-events: none;
+  z-index: 0;
+  animation: drift 30s ease-in-out infinite;
+}
+
+/* Nebula glow blobs */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 20%, rgba(124,110,255,.08) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 50% at 80% 80%, rgba(183,159,255,.06) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 60% 10%, rgba(255,110,247,.04) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+#root { min-height: 100vh; position: relative; z-index: 1; }
