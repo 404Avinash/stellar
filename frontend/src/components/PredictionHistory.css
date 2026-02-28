@@ -1,0 +1,45 @@
+﻿/* ── History ──────────────────────────────────────── */
+.hist-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.1rem; }
+.hist-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, #fff 0%, var(--accent2) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hist-count {
+  font-size: .75rem; font-weight: 700; color: var(--accent2);
+  background: rgba(124,110,255,.1); border: 1px solid rgba(124,110,255,.2);
+  padding: .25rem .8rem; border-radius: 20px;
+}
+.hist-table-wrap { overflow-x: auto; }
+.hist-table { width: 100%; border-collapse: collapse; font-size: .87rem; }
+.hist-table th {
+  text-align: left; padding: .55rem .75rem;
+  color: var(--text-dim); font-weight: 700; font-size: .73rem;
+  text-transform: uppercase; letter-spacing: .8px;
+  border-bottom: 1px solid var(--border);
+}
+.hist-table td { padding: .65rem .75rem; border-bottom: 1px solid rgba(30,35,64,.7); }
+.hist-table tbody tr { transition: background .18s; }
+.hist-table tbody tr:hover { background: rgba(124,110,255,.05); }
+.row-open { background: rgba(124,110,255,.06) !important; }
+.dim { color: var(--text-dim); }
+.badge {
+  display: inline-flex; align-items: center; gap: .3rem;
+  padding: .22rem .7rem; border-radius: 6px;
+  font-size: .76rem; font-weight: 800; text-transform: uppercase; letter-spacing: .6px;
+}
+.badge-green { background: rgba(0,255,163,.08); color: var(--green); border: 1px solid rgba(0,255,163,.25); text-shadow: 0 0 8px rgba(0,255,163,.4); }
+.badge-red   { background: rgba(255,95,126,.08); color: var(--red);   border: 1px solid rgba(255,95,126,.25); }
+.expand-btn {
+  background: none; border: 1px solid var(--border); color: var(--text-dim);
+  cursor: pointer; font-size: .75rem; padding: .2rem .5rem; border-radius: 6px; transition: all .18s;
+}
+.expand-btn:hover { color: var(--accent2); border-color: var(--accent2); background: rgba(124,110,255,.08); }
+.detail-row td { padding: .9rem 1.1rem !important; background: rgba(6,8,16,.6); }
+.detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: .4rem .8rem; }
+.detail-item { display: flex; justify-content: space-between; gap: .5rem; padding: .25rem 0; border-bottom: 1px solid rgba(30,35,64,.5); }
+.dk { color: var(--text-dim); font-size: .76rem; font-weight: 600; }
+.dv { font-weight: 700; font-size: .82rem; color: var(--accent2); }
