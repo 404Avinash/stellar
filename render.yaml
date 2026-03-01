@@ -5,7 +5,7 @@ services:
     runtime: python
     rootDir: .
     buildCommand: pip install -r backend/requirements.txt
-    startCommand: gunicorn --chdir backend app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    startCommand: python -m gunicorn --chdir backend app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
     envVars:
       - key: FRONTEND_URL
         value: https://svp-frontend.onrender.com   # update after frontend deploys
