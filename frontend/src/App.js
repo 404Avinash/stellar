@@ -4,6 +4,8 @@ import PredictionForm from './components/PredictionForm';
 import PredictionResults from './components/PredictionResults';
 import PredictionHistory from './components/PredictionHistory';
 import Statistics from './components/Statistics';
+import DatasetExplorer from './components/DatasetExplorer';
+import DiscoveryQueue from './components/DiscoveryQueue';
 import './App.css';
 
 const API = process.env.REACT_APP_API_URL || 'http://localhost:5000';
@@ -55,13 +57,15 @@ function App() {
 
       {/* Navigation */}
       <nav className="nav">
-        {['predict', 'history', 'statistics'].map((t) => (
+        {['predict', 'discover', 'explore', 'history', 'statistics'].map((t) => (
           <button
             key={t}
             className={`nav-btn ${tab === t ? 'active' : ''}`}
             onClick={() => setTab(t)}
           >
             {t === 'predict' && '🔭 '}
+            {t === 'discover' && '🚀 '}
+            {t === 'explore' && '🛰️ '}
             {t === 'history' && '📋 '}
             {t === 'statistics' && '📊 '}
             {t.charAt(0).toUpperCase() + t.slice(1)}
@@ -78,6 +82,8 @@ function App() {
             {prediction && <PredictionResults data={prediction} />}
           </>
         )}
+        {tab === 'discover' && <DiscoveryQueue apiBase={API} />}
+        {tab === 'explore' && <DatasetExplorer apiBase={API} />}
         {tab === 'history' && <PredictionHistory apiBase={API} />}
         {tab === 'statistics' && <Statistics apiBase={API} />}
       </main>

@@ -1,0 +1,172 @@
+/* HabitableZone.css — orbital diagram + similarity engine */
+.hz-panel {
+  grid-column: 1 / -1;
+  background: rgba(13,15,34,.88);
+  border: 1px solid rgba(0,255,163,.18);
+  border-radius: 14px;
+  padding: 20px 22px;
+  animation: slide-up .55s ease both;
+}
+.hz-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.hz-title {
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #b79fff;
+  text-transform: uppercase;
+}
+.hz-badge {
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: .7rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+.hz-in {
+  background: rgba(0,255,163,.12);
+  color: #00ffa3;
+  border: 1px solid rgba(0,255,163,.3);
+  box-shadow: 0 0 16px rgba(0,255,163,.15);
+}
+.hz-opt {
+  background: rgba(255,209,102,.1);
+  color: #ffd166;
+  border: 1px solid rgba(255,209,102,.25);
+}
+.hz-out {
+  background: rgba(255,95,126,.1);
+  color: #ff5f7e;
+  border: 1px solid rgba(255,95,126,.25);
+}
+.hz-body {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+.hz-canvas {
+  border-radius: 10px;
+  border: 1px solid rgba(124,110,255,.1);
+  flex-shrink: 0;
+}
+.hz-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 180px;
+}
+.hz-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  background: rgba(255,255,255,.025);
+  border: 1px solid rgba(124,110,255,.1);
+  border-radius: 8px;
+}
+.hz-stat-label {
+  font-size: .65rem;
+  font-weight: 700;
+  color: #5a6090;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+}
+.hz-stat-val {
+  font-size: .95rem;
+  font-weight: 800;
+  color: #b79fff;
+}
+
+/* ── Similarity Engine ── */
+.sim-section {
+  border-top: 1px solid rgba(124,110,255,.12);
+  padding-top: 16px;
+}
+.sim-title {
+  font-size: .7rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #b79fff;
+  text-transform: uppercase;
+  margin: 0 0 12px;
+}
+.sim-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+.sim-card {
+  background: rgba(255,255,255,.025);
+  border: 1px solid rgba(124,110,255,.12);
+  border-radius: 10px;
+  padding: 12px 14px;
+  transition: border-color .2s, transform .2s;
+}
+.sim-card:hover {
+  border-color: rgba(124,110,255,.35);
+  transform: translateY(-2px);
+}
+.sim-best {
+  border-color: rgba(0,255,163,.3) !important;
+  background: rgba(0,255,163,.03);
+}
+.sim-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.sim-rank {
+  font-size: .65rem;
+  font-weight: 800;
+  color: #5a6090;
+}
+.sim-name {
+  font-size: .85rem;
+  font-weight: 800;
+  color: #e8eaf6;
+}
+.sim-hz-tag {
+  font-size: .55rem;
+  font-weight: 800;
+  background: rgba(0,255,163,.15);
+  color: #00ffa3;
+  padding: 2px 6px;
+  border-radius: 8px;
+  letter-spacing: .8px;
+}
+.sim-desc {
+  font-size: .7rem;
+  color: #7b84b8;
+  line-height: 1.5;
+  margin: 0 0 8px;
+}
+.sim-compare {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.sim-compare span {
+  font-size: .68rem;
+  color: #5a6090;
+  font-weight: 600;
+}
+.sim-match {
+  margin: 8px 0 0;
+  font-size: .72rem;
+  font-weight: 800;
+  color: #00ffa3;
+}
+
+@media (max-width: 700px) {
+  .hz-body { flex-direction: column; }
+  .hz-canvas { width: 100% !important; }
+  .sim-grid { grid-template-columns: 1fr; }
+}

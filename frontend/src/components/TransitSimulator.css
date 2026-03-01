@@ -1,0 +1,79 @@
+/* TransitSimulator.css — live transit animation */
+.transit-sim {
+  background: rgba(13,15,34,.88);
+  border: 1px solid rgba(124,110,255,.25);
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-bottom: 1rem;
+  backdrop-filter: blur(14px);
+  animation: slide-up .5s ease both;
+}
+.ts-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.ts-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #ff6ef7;
+  box-shadow: 0 0 8px #ff6ef7;
+  animation: ts-blink 1.5s ease-in-out infinite;
+}
+@keyframes ts-blink {
+  0%,100% { opacity: 1; }
+  50% { opacity: .3; }
+}
+.ts-title {
+  font-size: .7rem;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  color: #b79fff;
+  text-transform: uppercase;
+}
+.ts-sub {
+  font-size: .65rem;
+  color: #5a6090;
+  margin-left: auto;
+}
+.ts-view {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 8px;
+}
+.ts-star-canvas {
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.ts-params {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  background: rgba(255,255,255,.02);
+  border: 1px solid rgba(124,110,255,.1);
+  border-radius: 8px;
+  min-width: 140px;
+}
+.ts-params span {
+  font-size: .72rem;
+  color: #6b7094;
+  font-weight: 600;
+}
+.ts-params em {
+  color: #b79fff;
+  font-style: normal;
+  font-weight: 800;
+}
+.ts-curve-canvas {
+  border-radius: 10px;
+  border: 1px solid rgba(124,110,255,.1);
+  width: 100% !important;
+  max-width: 520px;
+}
+
+@media (max-width: 700px) {
+  .ts-view { flex-direction: column; }
+  .ts-star-canvas, .ts-curve-canvas { width: 100% !important; }
+}

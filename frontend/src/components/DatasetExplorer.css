@@ -1,0 +1,200 @@
+/* DatasetExplorer.css — KOI dataset browser */
+.explorer {
+  animation: slide-up .45s ease both;
+}
+.exp-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.exp-title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, #fff 0%, #b79fff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0 0 4px;
+}
+.exp-sub {
+  font-size: .78rem;
+  color: #6b7094;
+  margin: 0;
+}
+.exp-search-input {
+  background: rgba(6,8,16,.8);
+  border: 1px solid rgba(124,110,255,.2);
+  color: #e8eaf6;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: .82rem;
+  font-family: 'Space Grotesk', sans-serif;
+  width: 240px;
+  transition: border-color .2s, box-shadow .2s;
+}
+.exp-search-input:focus {
+  outline: none;
+  border-color: #7c6eff;
+  box-shadow: 0 0 0 3px rgba(124,110,255,.15);
+}
+.exp-search-input::placeholder { color: #4a5270; }
+
+/* ── Filters ── */
+.exp-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.exp-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(124,110,255,.15);
+  background: rgba(255,255,255,.02);
+  color: #9ba3d4;
+  font-size: .75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .2s;
+  font-family: 'Space Grotesk', sans-serif;
+}
+.exp-pill:hover { border-color: var(--pc); color: var(--pc); }
+.exp-pill.active {
+  border-color: var(--pc);
+  color: var(--pc);
+  background: rgba(124,110,255,.08);
+  box-shadow: 0 0 12px rgba(124,110,255,.1);
+}
+.exp-pill em { font-style: normal; opacity: .6; }
+.pill-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.exp-total {
+  margin-left: auto;
+  font-size: .72rem;
+  color: #5a6090;
+  font-weight: 600;
+}
+
+/* ── Table ── */
+.exp-table-wrap {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(124,110,255,.15);
+  background: rgba(13,15,34,.85);
+  backdrop-filter: blur(12px);
+}
+.exp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .78rem;
+}
+.exp-table thead th {
+  padding: 10px 12px;
+  text-align: left;
+  font-size: .68rem;
+  font-weight: 800;
+  color: #5a6090;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  border-bottom: 1px solid rgba(124,110,255,.12);
+  cursor: pointer;
+  transition: color .2s;
+  white-space: nowrap;
+  user-select: none;
+}
+.exp-table thead th:hover { color: #b79fff; }
+.exp-table thead th.sorted { color: #b79fff; }
+.sort-arrow { color: #7c6eff; }
+.exp-table tbody td {
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(124,110,255,.06);
+  color: #9ba3d4;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.exp-row {
+  cursor: pointer;
+  transition: background .15s;
+}
+.exp-row:hover {
+  background: rgba(124,110,255,.06);
+}
+.disp-tag {
+  font-weight: 800;
+  font-size: .72rem;
+  letter-spacing: .5px;
+}
+.classify-hint {
+  font-size: .68rem;
+  color: #3a4060;
+  font-style: italic;
+}
+.classify-loading { animation: ts-blink 1s ease infinite; }
+.classify-err { font-size: .68rem; color: #fb923c; }
+.classify-result {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.classify-result span:first-child {
+  font-weight: 800;
+  font-size: .78rem;
+}
+.classify-radius {
+  font-size: .65rem;
+  color: #5a6090;
+}
+.exp-loading, .exp-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #5a6090;
+  font-size: .85rem;
+}
+.exp-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ── Pagination ── */
+.exp-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+.exp-pager button {
+  background: rgba(124,110,255,.1);
+  border: 1px solid rgba(124,110,255,.18);
+  color: #b79fff;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: .8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .2s;
+  font-family: 'Space Grotesk', sans-serif;
+}
+.exp-pager button:hover:not(:disabled) {
+  background: rgba(124,110,255,.2);
+  border-color: #7c6eff;
+}
+.exp-pager button:disabled {
+  opacity: .25;
+  cursor: not-allowed;
+}
+.pager-info {
+  font-size: .75rem;
+  color: #6b7094;
+  font-weight: 600;
+  min-width: 120px;
+  text-align: center;
+}

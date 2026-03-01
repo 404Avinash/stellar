@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import TransitSimulator from './TransitSimulator';
 import './PredictionForm.css';
 
 const FEATURES = [
@@ -81,6 +82,9 @@ function PredictionForm({ onSubmit, loading }) {
           </button>
         ))}
       </div>
+
+      {/* Live Transit Simulator */}
+      <TransitSimulator params={values} />
 
       <form onSubmit={handleSubmit} className="form-grid">
         {FEATURES.map((f) => (

@@ -2,6 +2,7 @@ import React from 'react';
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
 } from 'recharts';
+import HabitableZone from './HabitableZone';
 import './PredictionResults.css';
 
 const COLORS = { confirmed: '#00ffa3', false_positive: '#ff5f7e' };
@@ -207,6 +208,11 @@ function PredictionResults({ data }) {
         <span className="latency-dot" />
         {latency_ms?.toFixed(0)} ms inference
       </div>
+
+      {/* Habitable Zone + Exoplanet Similarity */}
+      {data.input && (
+        <HabitableZone input={data.input} radius={predicted_radius} />
+      )}
     </div>
   );
 }

@@ -66,10 +66,9 @@ build/
 .Trashes
 ehthumbs.db
 
-# Models
-models/*.pkl
-models/*.joblib
+# Models — committed so Render doesn't need to retrain
+# models/*.pkl
+# models/*.joblib
 
-# Data
-data/*.csv
-!data/SAMPLE_DATA.md
+# Data — committed for Render deployment
+# data/*.csv
