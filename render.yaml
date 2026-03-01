@@ -1,0 +1,25 @@
+services:
+  # ── Flask Backend ─────────────────────────────────────
+  - type: web
+    name: svp-backend
+    runtime: python
+    rootDir: .
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: gunicorn --chdir backend app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    envVars:
+      - key: FRONTEND_URL
+        value: https://svp-frontend.onrender.com   # update after frontend deploys
+
+  # ── React Frontend ────────────────────────────────────
+  - type: static
+    name: svp-frontend
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./build
+    envVars:
+      - key: REACT_APP_API_URL
+        value: https://svp-backend.onrender.com    # update after backend deploys
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
