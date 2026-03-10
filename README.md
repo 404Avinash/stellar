@@ -11,7 +11,7 @@ The Stellar Verification Program uses advanced machine learning to:
 ## 📋 Project Structure
 
 ```
-nas_charlie/
+Stellar/
 ├── frontend/              # React.js web application
 │   ├── public/           # Static assets
 │   ├── src/              # React components
