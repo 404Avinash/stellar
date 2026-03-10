@@ -194,8 +194,10 @@ Delete `exoplanet_predictions.db` and restart the Flask app to reset the databas
 See `ml_pipeline/README.md` for detailed ML pipeline documentation.
 
 ## 👥 Team
-
-[Add your team members here]
+TEAM : RUSTY.
+Avinash Jha
+Ayush Belwal 
+Ayush Kirti Singh
 
 ## 📄 License
 
