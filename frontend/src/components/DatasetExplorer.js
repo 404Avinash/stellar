@@ -13,8 +13,14 @@ const DISP_COLORS = {
   CANDIDATE: "#ffd166",
 };
 
+const DISP_LABELS = {
+  CONFIRMED: "✅ Real Planet",
+  "FALSE POSITIVE": "❌ False Alarm",
+  CANDIDATE: "❓ Under Investigation",
+};
+
 const COLUMNS = [
-  { key: "kepoi_name", label: "KOI Name", w: 110 },
+  { key: "kepoi_name", label: "Star ID", w: 110 },
   { key: "koi_disposition", label: "Status", w: 120 },
   { key: "koi_period", label: "Period (d)", w: 90, num: true },
   { key: "koi_depth", label: "Depth (ppm)", w: 90, num: true },
