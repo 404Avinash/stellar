@@ -101,8 +101,8 @@ export default function DiscoveryQueue({ apiBase }) {
       <div className="dq">
         <div className="dq-loading">
           <div className="dq-spinner" />
-          <p>Classifying 1,872 CANDIDATE KOIs &amp; generating mission assignments…</p>
-          <p className="dq-sub">Running Stacking Ensemble inference + role assignment engine</p>
+          <p>Scanning 1,872 unverified star signals with the AI…</p>
+          <p className="dq-sub">This takes a few seconds — classifying each signal and assigning it to the right science team</p>
         </div>
       </div>
     );
@@ -113,8 +113,8 @@ export default function DiscoveryQueue({ apiBase }) {
       <div className="dq">
         <div className="dq-error">
           <span className="dq-error-icon">⚠</span>
-          <p>{error}</p>
-          <button onClick={fetchDiscovery} className="dq-retry-btn">Retry</button>
+          <p>Oops — couldn’t load the discovery data: <em>{error}</em></p>
+          <button onClick={fetchDiscovery} className="dq-retry-btn">Try again</button>
         </div>
       </div>
     );
@@ -128,10 +128,10 @@ export default function DiscoveryQueue({ apiBase }) {
     <div className="dq">
       {/* ── Hero Header ─────────────────────────────────────── */}
       <div className="dq-hero">
-        <h2 className="dq-title">Mission Assignment Engine</h2>
+        <h2 className="dq-title">🚀 Planet Discovery Mission Queue</h2>
         <p className="dq-sub">
-          AI-classified {data.classified.toLocaleString()} unresolved CANDIDATE KOIs →
-          generated role-based follow-up assignments for 7 scientific teams
+          Our AI scanned {data.classified.toLocaleString()} unverified star signals and sorted them
+          by how likely they are to be real planets — then assigned each one to a science team for follow-up.
         </p>
       </div>
 
@@ -139,29 +139,29 @@ export default function DiscoveryQueue({ apiBase }) {
       <div className="dq-kpi-strip">
         <div className="dq-kpi">
           <span className="dq-kpi-value">{data.classified.toLocaleString()}</span>
-          <span className="dq-kpi-label">KOIs Classified</span>
+          <span className="dq-kpi-label">Star Systems Scanned</span>
         </div>
         <div className="dq-kpi">
           <span className="dq-kpi-value dq-kpi-green">{summary.confirmed_predictions.toLocaleString()}</span>
-          <span className="dq-kpi-label">Predicted Confirmed</span>
+          <span className="dq-kpi-label">✅ Likely Real Planets</span>
         </div>
         <div className="dq-kpi">
           <span className="dq-kpi-value dq-kpi-red">{summary.false_positive_predictions.toLocaleString()}</span>
-          <span className="dq-kpi-label">Predicted FP</span>
+          <span className="dq-kpi-label">❌ Likely False Alarms</span>
         </div>
         <div className="dq-kpi">
           <span className="dq-kpi-value dq-kpi-blue">{summary.habitable_zone}</span>
-          <span className="dq-kpi-label">Habitable Zone</span>
+          <span className="dq-kpi-label">🌍 In Goldilocks Zone</span>
         </div>
         <div className="dq-kpi">
           <span className="dq-kpi-value dq-kpi-purple">{summary.avg_priority_score}</span>
-          <span className="dq-kpi-label">Avg Priority Score</span>
+          <span className="dq-kpi-label">Avg Urgency Score</span>
         </div>
       </div>
 
       {/* ── Role Breakdown Cards ────────────────────────────── */}
       <div className="dq-role-overview">
-        <h3 className="dq-section-title">Team Workload Distribution</h3>
+        <h3 className="dq-section-title">Which Science Teams Are Investigating?</h3>
         <div className="dq-role-cards">
           {summary.role_breakdown.map((rb) => (
             <button
@@ -186,7 +186,7 @@ export default function DiscoveryQueue({ apiBase }) {
       <div className="dq-filters">
         {loading && <div className="dq-reload-overlay"><div className="dq-spinner dq-spinner-sm" /></div>}
         <div className="dq-filter-group">
-          <label>Priority</label>
+          <label>Filter by Urgency</label>
           <div className="dq-filter-pills">
             {['', 'HIGH', 'MEDIUM', 'STANDARD'].map((p) => (
               <button
@@ -195,7 +195,7 @@ export default function DiscoveryQueue({ apiBase }) {
                 onClick={() => { setPriorityFilter(p); setPage(1); }}
                 style={p ? { '--pill-color': PRIORITY_COLORS[p] } : {}}
               >
-                {p || 'All'}
+                {p === '' ? 'All' : p === 'HIGH' ? '🔴 High' : p === 'MEDIUM' ? '🟠 Medium' : '⚪ Standard'}
               </button>
             ))}
           </div>
@@ -207,11 +207,11 @@ export default function DiscoveryQueue({ apiBase }) {
               checked={hzOnly}
               onChange={(e) => { setHzOnly(e.target.checked); setPage(1); }}
             />
-            {' '}Habitable Zone Only
+            {' '}🌍 Only show planets in the Goldilocks Zone
           </label>
         </div>
         <div className="dq-filter-meta">
-          Showing {data.total_filtered.toLocaleString()} candidates
+          Showing <strong>{data.total_filtered.toLocaleString()}</strong> planet candidates
           {roleFilter && <span className="dq-active-filter"> • {roleFilter}</span>}
           {priorityFilter && <span className="dq-active-filter"> • {priorityFilter} priority</span>}
           {hzOnly && <span className="dq-active-filter"> • HZ only</span>}
@@ -226,11 +226,11 @@ export default function DiscoveryQueue({ apiBase }) {
       {/* ── Sort Controls ───────────────────────────────────── */}
       <div className="dq-sort-bar">
         {[
-          { key: 'priority_score', label: 'Priority Score' },
-          { key: 'conf_prob', label: 'Confidence' },
-          { key: 'radius', label: 'Radius' },
-          { key: 'num_roles', label: '# Tasks' },
-          { key: 'period', label: 'Period' },
+          { key: 'priority_score', label: 'Urgency Score' },
+          { key: 'conf_prob',      label: 'AI Confidence' },
+          { key: 'radius',         label: 'Planet Size' },
+          { key: 'num_roles',      label: 'Teams Needed' },
+          { key: 'period',         label: 'Orbit Length' },
         ].map((s) => (
           <button
             key={s.key}
@@ -245,10 +245,10 @@ export default function DiscoveryQueue({ apiBase }) {
       {/* ── Candidate Cards ─────────────────────────────────── */}      {data.data.length === 0 && (
         <div className="dq-empty">
           <span className="dq-empty-icon">🔭</span>
-          <p>No candidates match the current filters</p>
+          <p>No candidates match your current filters. Try relaxing them to see more results.</p>
           <button className="dq-retry-btn" onClick={() => {
             setRoleFilter(''); setPriorityFilter(''); setHzOnly(false); setPage(1);
-          }}>Clear all filters</button>
+          }}>Clear all filters &amp; show everything</button>
         </div>
       )}      <div className="dq-candidates">
         {data.data.map((c, i) => (
@@ -293,11 +293,11 @@ export default function DiscoveryQueue({ apiBase }) {
                   </span>
                 </div>
                 <div className="dq-card-stats">
-                  <span>P = {c.koi_period < 100 ? c.koi_period.toFixed(2) : c.koi_period.toFixed(0)}d</span>
-                  <span>R = {c.predicted_radius.toFixed(2)} R⊕</span>
-                  <span>SNR = {c.koi_model_snr.toFixed(1)}</span>
-                  <span>T★ = {c.koi_steff.toFixed(0)} K</span>
-                  {c.koi_count > 1 && <span className="dq-multi">×{c.koi_count} planets</span>}
+                  <span title="How often this planet goes around its star">Orbit: {c.koi_period < 100 ? c.koi_period.toFixed(2) : c.koi_period.toFixed(0)} days</span>
+                  <span title="Planet size compared to Earth">Size: {c.predicted_radius.toFixed(2)} × Earth</span>
+                  <span title="How clearly the signal stands out from noise">Signal: {c.koi_model_snr.toFixed(1)}</span>
+                  <span title="Temperature of the host star in Kelvin">Star Temp: {c.koi_steff.toFixed(0)} K</span>
+                  {c.koi_count > 1 && <span className="dq-multi">×{c.koi_count} planets in system</span>}
                 </div>
               </div>
               <div className="dq-card-roles-mini">
@@ -309,7 +309,7 @@ export default function DiscoveryQueue({ apiBase }) {
                     style={{ background: ROLE_COLORS[a.role] || '#7c6eff' }}
                   />
                 ))}
-                <span className="dq-roles-count">{c.num_roles} tasks</span>
+                <span className="dq-roles-count">{c.num_roles} team{c.num_roles !== 1 ? 's' : ''} assigned</span>
               </div>
               <span className="dq-expand-arrow">{expandedIdx === c.index ? '▲' : '▼'}</span>
             </div>
@@ -317,7 +317,7 @@ export default function DiscoveryQueue({ apiBase }) {
             {/* Expanded: Role Assignments */}
             {expandedIdx === c.index && (
               <div className="dq-card-body">
-                <h4 className="dq-assign-title">Mission Assignments</h4>
+                <h4 className="dq-assign-title">What Scientists Need To Do</h4>
                 <div className="dq-assignments">
                   {c.role_assignments.map((a, j) => (
                     <div
@@ -337,7 +337,7 @@ export default function DiscoveryQueue({ apiBase }) {
                         <strong>Task:</strong> {a.task}
                       </div>
                       <div className="dq-assign-reason">
-                        <strong>Scientific Justification:</strong> {a.reason}
+                        <strong>Why this matters:</strong> {a.reason}
                       </div>
                       <div className="dq-assign-footer">
                         <span className="dq-assign-deliverable">
@@ -351,25 +351,28 @@ export default function DiscoveryQueue({ apiBase }) {
 
                 {/* Candidate Detail Table */}
                 <div className="dq-detail-table">
-                  <h4 className="dq-assign-title">Candidate Parameters</h4>
+                  <h4 className="dq-assign-title">Planet & Star Details</h4>
+                  <p style={{ fontSize: '0.75rem', color: '#6b7094', margin: '0 0 8px' }}>Raw measurements from the Kepler telescope:</p>
                   <div className="dq-params-grid">
-                    {[
-                      { label: 'Period', value: `${c.koi_period.toFixed(4)} days`, key: 'period' },
-                      { label: 'Transit Depth', value: `${c.koi_depth.toFixed(1)} ppm`, key: 'depth' },
-                      { label: 'Duration', value: `${c.koi_duration.toFixed(3)} hrs`, key: 'dur' },
-                      { label: 'SNR', value: c.koi_model_snr.toFixed(2), key: 'snr' },
-                      { label: 'Stellar Teff', value: `${c.koi_steff.toFixed(0)} K`, key: 'teff' },
-                      { label: 'Stellar Radius', value: `${c.koi_srad.toFixed(3)} R☉`, key: 'srad' },
-                      { label: 'Stellar Mass', value: `${c.koi_smass.toFixed(3)} M☉`, key: 'smass' },
-                      { label: 'Catalog Radius', value: c.koi_prad ? `${c.koi_prad.toFixed(3)} R⊕` : '—', key: 'prad' },
-                      { label: 'Insolation', value: c.koi_insol ? `${c.koi_insol.toFixed(2)} S⊕` : '—', key: 'insol' },
-                      { label: 'Planets in System', value: c.koi_count, key: 'count' },
-                    ].map((p) => (
-                      <div key={p.key} className="dq-param">
-                        <span className="dq-param-label">{p.label}</span>
-                        <span className="dq-param-value">{p.value}</span>
-                      </div>
-                    ))}
+                    {
+                      [
+                        { label: 'Orbit Duration',          value: `${c.koi_period.toFixed(4)} days` },
+                        { label: 'Light Blocked',            value: `${c.koi_depth.toFixed(1)} ppm` },
+                        { label: 'Transit Length',           value: `${c.koi_duration.toFixed(3)} hrs` },
+                        { label: 'Signal Strength (SNR)',    value: c.koi_model_snr.toFixed(2) },
+                        { label: 'Star Temperature',         value: `${c.koi_steff.toFixed(0)} K` },
+                        { label: 'Star Size (× Sun)',        value: `${c.koi_srad.toFixed(3)}` },
+                        { label: 'Star Mass (× Sun)',        value: `${c.koi_smass.toFixed(3)}` },
+                        { label: 'Planet Size (× Earth)',    value: c.koi_prad ? `${c.koi_prad.toFixed(3)}` : '—' },
+                        { label: 'Sunlight Received (× Earth)', value: c.koi_insol ? `${c.koi_insol.toFixed(2)}` : '—' },
+                        { label: 'Planets in Same System',  value: c.koi_count },
+                      ].map((p) => (
+                        <div key={p.label} className="dq-param">
+                          <span className="dq-param-label">{p.label}</span>
+                          <span className="dq-param-value">{p.value}</span>
+                        </div>
+                      ))
+                    }
                   </div>
                 </div>
               </div>
@@ -384,9 +387,9 @@ export default function DiscoveryQueue({ apiBase }) {
           disabled={page <= 1}
           onClick={() => setPage(p => p - 1)}
           className="dq-page-btn"
-        >← Prev</button>
+        >← Previous</button>
         <span className="dq-page-info">
-          Page {data.page} of {data.pages}
+          Page {data.page} of {data.pages} &nbsp;·&nbsp; {data.total_filtered.toLocaleString()} total candidates
         </span>
         <button
           disabled={page >= data.pages}

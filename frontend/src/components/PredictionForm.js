@@ -3,16 +3,16 @@ import TransitSimulator from './TransitSimulator';
 import './PredictionForm.css';
 
 const FEATURES = [
-  { key: 'koi_period',     label: 'Orbital Period (days)',      placeholder: '3.5',    tip: 'Time for one orbit around the star' },
-  { key: 'koi_impact',     label: 'Impact Parameter',           placeholder: '0.45',   tip: '0 = center transit, 1 = grazing (0–1+)' },
-  { key: 'koi_duration',   label: 'Transit Duration (hrs)',     placeholder: '2.8',    tip: 'How long transit lasts' },
-  { key: 'koi_depth',      label: 'Transit Depth (ppm)',        placeholder: '500',    tip: 'Fractional dip in stellar brightness' },
-  { key: 'koi_model_snr',  label: 'Model SNR',                  placeholder: '30',     tip: 'Signal-to-noise of transit model fit' },
-  { key: 'koi_steff',      label: 'Stellar Temp (K)',            placeholder: '5700',   tip: 'Host star effective temperature' },
-  { key: 'koi_slogg',      label: 'Stellar log(g)',              placeholder: '4.4',    tip: 'Host star surface gravity (log cgs)' },
-  { key: 'koi_srad',       label: 'Stellar Radius (R☉)',       placeholder: '1.0',    tip: 'Host star radius in solar radii' },
-  { key: 'koi_smass',      label: 'Stellar Mass (M☉)',         placeholder: '1.0',    tip: 'Host star mass in solar masses' },
-  { key: 'koi_smet',       label: 'Stellar Metallicity',        placeholder: '0.0',    tip: '[Fe/H] relative to Sun' },
+  { key: 'koi_period',    label: 'Planet’s Orbit Duration (days)',       placeholder: '3.5',   tip: 'How many Earth-days the planet takes to go all the way around its star. Earth = 365 days. A close-in planet might be just 3 days!' },
+  { key: 'koi_impact',   label: 'Transit Path (0 = centre, 1 = edge)',   placeholder: '0.45',  tip: '0 means the planet crosses right through the middle of the star’s disc. 1 means it barely grazes the edge. Closer to 0 = cleaner signal.' },
+  { key: 'koi_duration', label: 'Transit Length (hours)',                 placeholder: '2.8',   tip: 'How many hours the planet blocks part of the star’s light as it passes in front of it.' },
+  { key: 'koi_depth',    label: 'Starlight Blocked (ppm)',                placeholder: '500',   tip: 'Parts-per-million of starlight blocked. 1,000,000 ppm = 100%. Earth blocks ~84 ppm. Jupiter blocks ~14,000 ppm. Bigger planet = more light blocked.' },
+  { key: 'koi_model_snr',label: 'Detection Clarity Score (SNR)',          placeholder: '30',    tip: 'Signal-to-noise ratio — how clearly the transit stands out above background noise. Above 10 is solid. Below 7 is hard to trust.' },
+  { key: 'koi_steff',    label: 'Star’s Temperature (Kelvin)',            placeholder: '5700',  tip: 'How hot the host star is. Our Sun = 5,778 K (yellow). Red dwarfs ≈ 3,000 K. Blue-white stars > 10,000 K.' },
+  { key: 'koi_slogg',    label: 'Star’s Surface Gravity (log g)',         placeholder: '4.4',   tip: 'A measure of how strong gravity is on the star’s surface. Normal stars like our Sun = ~4.4. Giant stars = ~2–3.' },
+  { key: 'koi_srad',     label: 'Star’s Size (compared to our Sun)',      placeholder: '1.0',   tip: '1.0 = same size as our Sun. 0.5 = half the size. 2.0 = twice as big. This directly affects how big the planet looks.' },
+  { key: 'koi_smass',    label: 'Star’s Mass (compared to our Sun)',      placeholder: '1.0',   tip: '1.0 = same mass as our Sun. Heavier stars are hotter and shorter-lived. This helps calculate planet orbit size.' },
+  { key: 'koi_smet',     label: 'Star’s Metal Content (vs Sun)',          placeholder: '0.0',   tip: '0 = same metal content as our Sun. Negative = fewer metals. Positive = more. Most stars are between −0.5 and +0.5.' },
 ];
 
 const DEFAULT_VALUES = {};
@@ -62,10 +62,11 @@ function PredictionForm({ onSubmit, loading }) {
 
   return (
     <div className="card form-card">
-      <h2 className="form-title">🔭 Predict Exoplanet Status</h2>
+      <h2 className="form-title">🔭 Does This Star Have a Planet?</h2>
       <p className="form-subtitle">
-        Enter Kepler Object of Interest (KOI) parameters to classify the candidate
-        and predict its planetary radius.
+        Fill in what we know about the star and its signal, then click <strong>Run AI Check</strong>.
+        Not sure what the numbers mean? Hover the <strong>ⓘ</strong> icons for plain-English explanations,
+        or pick one of the quick presets below to get started instantly.
       </p>
 
       {/* Presets */}
@@ -107,7 +108,7 @@ function PredictionForm({ onSubmit, loading }) {
 
         <div className="form-actions">
           <button type="submit" className="btn-primary" disabled={loading}>
-            {loading ? '⏳ Predicting…' : '🚀 Run Prediction'}
+            {loading ? '⏳ Checking…' : '🚀 Run AI Check'}
           </button>
           <button type="button" className="btn-secondary" onClick={handleClear}>
             Clear

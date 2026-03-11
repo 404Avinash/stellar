@@ -99,15 +99,15 @@ export default function DatasetExplorer({ apiBase }) {
     <div className="explorer">
       <div className="exp-header">
         <div>
-          <h2 className="exp-title">🛰️ KOI Dataset Explorer</h2>
+          <h2 className="exp-title">🛰️ Browse Real NASA Star Systems</h2>
           <p className="exp-sub">
-            Browse {total.toLocaleString()} Kepler Objects of Interest · Click any row to classify with AI
+            {total.toLocaleString()} real star systems from NASA’s Kepler mission · Click any row for an AI planet check
           </p>
         </div>
         <div className="exp-search">
           <input
             className="exp-search-input"
-            placeholder="Search KOI name or KepID…"
+            placeholder="Search by star name or ID (e.g. K00752, 757450)…"
             value={search}
             onChange={e => { setSearch(e.target.value); setPage(1); }}
           />
@@ -124,7 +124,7 @@ export default function DatasetExplorer({ apiBase }) {
             onClick={() => handleFilter(d)}
           >
             <span className="pill-dot" style={{ background: DISP_COLORS[d] }} />
-            {d} <em>{cnt.toLocaleString()}</em>
+            {DISP_LABELS[d] || d} <em>{cnt.toLocaleString()}</em>
           </button>
         ))}
         <span className="exp-total">{total.toLocaleString()} objects</span>
@@ -144,17 +144,17 @@ export default function DatasetExplorer({ apiBase }) {
                   {sort === c.key && <span className="sort-arrow">{dir === "asc" ? " ↑" : " ↓"}</span>}
                 </th>
               ))}
-              <th style={{ width: 100 }}>AI Verdict</th>
+              <th style={{ width: 100 }}>AI Planet Check</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr><td colSpan={COLUMNS.length + 1} className="exp-loading">
                 <div className="orbit-loader"><div /><div /><div /></div>
-                Loading KOI data…
+                Loading star systems…
               </td></tr>
             ) : data.length === 0 ? (
-              <tr><td colSpan={COLUMNS.length + 1} className="exp-empty">No objects match filters</td></tr>
+              <tr><td colSpan={COLUMNS.length + 1} className="exp-empty">No star systems match your filters</td></tr>
             ) : data.map((row, i) => {
               const name = row.kepoi_name;
               const cr = classResult[name];
@@ -164,7 +164,7 @@ export default function DatasetExplorer({ apiBase }) {
                     <td key={c.key}>
                       {c.key === "koi_disposition" ? (
                         <span className="disp-tag" style={{ color: DISP_COLORS[row[c.key]] }}>
-                          {row[c.key]}
+                          {DISP_LABELS[row[c.key]] || row[c.key]}
                         </span>
                       ) : c.num && row[c.key] !== "" ? (
                         Number(row[c.key]).toFixed(c.key === "koi_period" ? 2 : c.key === "koi_prad" ? 3 : 1)
@@ -180,13 +180,13 @@ export default function DatasetExplorer({ apiBase }) {
                       ) : (
                         <div className="classify-result">
                           <span style={{ color: cr.label === "CONFIRMED" ? "#00ffa3" : "#ff5f7e" }}>
-                            {cr.label === "CONFIRMED" ? "✓" : "✗"} {(cr.confidence * 100).toFixed(0)}%
-                          </span>
-                          <span className="classify-radius">{cr.radius?.toFixed(2)} R⊕</span>
+                              {cr.label === "CONFIRMED" ? "✅" : "❌"} {(cr.confidence * 100).toFixed(0)}% sure
+                            </span>
+                            <span className="classify-radius">{cr.radius?.toFixed(2)} × Earth</span>
                         </div>
                       )
                     ) : (
-                      <span className="classify-hint">Click</span>
+                      <span className="classify-hint">🔎 Check</span>
                     )}
                   </td>
                 </tr>
@@ -199,13 +199,13 @@ export default function DatasetExplorer({ apiBase }) {
       {/* Pagination */}
       {pages > 1 && (
         <div className="exp-pager">
-          <button disabled={page <= 1} onClick={() => setPage(1)}>⏮</button>
-          <button disabled={page <= 1} onClick={() => setPage(p => p - 1)}>◀</button>
+          <button disabled={page <= 1} onClick={() => setPage(1)} title="First page">⏮ First</button>
+          <button disabled={page <= 1} onClick={() => setPage(p => p - 1)}>◄ Prev</button>
           <span className="pager-info">
             Page {page} of {pages.toLocaleString()}
           </span>
-          <button disabled={page >= pages} onClick={() => setPage(p => p + 1)}>▶</button>
-          <button disabled={page >= pages} onClick={() => setPage(pages)}>⏭</button>
+          <button disabled={page >= pages} onClick={() => setPage(p => p + 1)}>Next ►</button>
+          <button disabled={page >= pages} onClick={() => setPage(pages)} title="Last page">Last ⏭</button>
         </div>
       )}
     </div>

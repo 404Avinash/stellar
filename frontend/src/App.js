@@ -44,31 +44,32 @@ function App() {
           <h1 className="logo">
             <span className="logo-icon">✦</span> Stellar Verification Program
           </h1>
-          <p className="tagline">Exoplanet Classification &amp; Radius Prediction</p>
+          <p className="tagline">Does this star have a planet? Find out using real NASA data.</p>
           <div className="header-badges">
-            <span className="hbadge hbadge-purple">Stacking Ensemble AI</span>
-            <span className="hbadge hbadge-green">6,128+ Confirmed in Archive</span>
-            <span className="hbadge hbadge-blue">Kepler Q1-Q17 · 9,564 KOIs</span>
-            <span className="hbadge hbadge-pink">ROC-AUC 97.6%</span>
-            <span className="hbadge hbadge-yellow">∼40% FP Rate → Solved</span>
+            <span className="hbadge hbadge-purple">🤖 AI-Powered</span>
+            <span className="hbadge hbadge-green">✅ 6,128+ Real Planets Found</span>
+            <span className="hbadge hbadge-blue">🔭 9,564 Star Systems Analysed</span>
+            <span className="hbadge hbadge-pink">⭐ 97.6% Accuracy</span>
+            <span className="hbadge hbadge-yellow">🚫 Filters Out False Alarms</span>
           </div>
         </div>
       </header>
 
       {/* Navigation */}
       <nav className="nav">
-        {['predict', 'discover', 'explore', 'history', 'statistics'].map((t) => (
+        {[
+          { key: 'predict',    icon: '🔭', label: 'Check a Planet' },
+          { key: 'discover',   icon: '🚀', label: 'Mission Queue'  },
+          { key: 'explore',    icon: '🛰️', label: 'Star Database'  },
+          { key: 'history',    icon: '📋', label: 'My History'     },
+          { key: 'statistics', icon: '📊', label: 'Statistics'     },
+        ].map((t) => (
           <button
-            key={t}
-            className={`nav-btn ${tab === t ? 'active' : ''}`}
-            onClick={() => setTab(t)}
+            key={t.key}
+            className={`nav-btn ${tab === t.key ? 'active' : ''}`}
+            onClick={() => setTab(t.key)}
           >
-            {t === 'predict' && '🔭 '}
-            {t === 'discover' && '🚀 '}
-            {t === 'explore' && '🛰️ '}
-            {t === 'history' && '📋 '}
-            {t === 'statistics' && '📊 '}
-            {t.charAt(0).toUpperCase() + t.slice(1)}
+            {t.icon} {t.label}
           </button>
         ))}
       </nav>
@@ -83,7 +84,7 @@ function App() {
           </>
         )}
         {tab === 'discover' && <DiscoveryQueue apiBase={API} />}
-        {tab === 'explore' && <DatasetExplorer apiBase={API} />}
+        {tab === 'explore'  && <DatasetExplorer apiBase={API} />}
         {tab === 'history' && <PredictionHistory apiBase={API} />}
         {tab === 'statistics' && <Statistics apiBase={API} />}
       </main>

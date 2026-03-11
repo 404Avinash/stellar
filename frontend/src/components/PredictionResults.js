@@ -11,58 +11,58 @@ const COLORS = { confirmed: '#00ffa3', false_positive: '#ff5f7e' };
 function getFPContext(confidence) {
   if (confidence >= 0.80) return {
     icon: '⚡',
-    type: 'Eclipsing Binary (EB)',
-    desc: 'High-confidence FP — most likely an eclipsing binary system. Deep V-shaped light curve dips mimic planetary transits; a secondary eclipse typically visible at ½ orbital period distinguishes this scenario. Accounts for ~50% of Kepler false positives.',
+    type: 'Two Stars Mimicking a Planet (Eclipsing Binary)',
+    desc: 'The signal is most likely caused by two stars orbiting each other, not a planet. When one star passes in front of the other, it creates a dip in brightness that looks just like a planet transit. This is the most common ‘false alarm’ in planet hunting — accounting for about half of all fake detections.',
     color: '#ff5f7e',
-    tag: 'MOST COMMON FP',
+    tag: 'MOST COMMON FALSE ALARM',
   };
   if (confidence >= 0.60) return {
     icon: '🔀',
-    type: 'Blended / Background EB',
-    desc: 'Intermediate-confidence FP — possibly a blended background eclipsing binary. A foreground star dilutes the deep EB signal to a planet-like depth. Centroid shift analysis (astrometry) can confirm — the centroid should shift toward the background source during eclipse.',
+    type: 'Blended Background Stars (Background EB)',
+    desc: 'There is probably a pair of eclipsing stars somewhere behind or near our target star. Their signal gets mixed in with the target star’s light and creates a shallower dip that looks planet-sized. Astronomers can check this by seeing if the light source slightly shifts position during the dip.',
     color: '#fb923c',
-    tag: 'BACKGROUND BLEND',
+    tag: 'BACKGROUND STAR BLEND',
   };
   return {
     icon: '🌀',
-    type: 'Stellar Variability / Artifact',
-    desc: 'Low-confidence FP — consistent with stellar activity (starspots, pulsations, flares) or instrumental systematics. Unlike true transits, variability signatures evolve over time and lack strict periodicity. BLENDER or PASTIS Bayesian validation recommended for confirmation.',
+    type: 'Star Itself Acting Up (Stellar Variability)',
+    desc: 'The dip in brightness may be caused by the star itself — things like starspots (like sunspots but bigger), stellar flares, or pulsations. Unlike a real planet transit, these signals tend to change over time and don’t have a perfectly regular schedule.',
     color: '#ffd166',
-    tag: 'STELLAR ACTIVITY',
+    tag: 'STELLAR NOISE',
   };
 }
 
 /* ── Planet size classification (Kepler radius gap research) ── */
 function getPlanetContext(radius) {
   if (radius < 1.0) return {
-    icon: '🌑', type: 'Sub-Earth Class',
-    desc: 'Extraordinarily rare — one of the smallest exoplanet classes known. Sub-Earths are difficult to detect even with Kepler. If confirmed, mass determination via radial velocity is critical to distinguish from Mercury-analog.',
-    color: '#38bdf8', range: '< 1.0 R⊕',
+    icon: '🌑', type: 'Smaller Than Earth',
+    desc: 'This planet is even smaller than Earth — one of the tiniest known. Planets this small are very hard to detect because they block so little starlight. If confirmed, scientists would want to measure its mass to understand what it’s made of.',
+    color: '#38bdf8', range: '< 1.0 × Earth',
   };
   if (radius < 1.5) return {
-    icon: '🌍', type: 'Earth-Analog Class',
-    desc: 'Earth-sized rocky world. Prime habitable zone candidate — cross-reference stellar effective temperature and semi-major axis for liquid water potential. Radius < 1.5 R⊕ strongly suggests rocky bulk composition (below the Kepler radius gap).',
-    color: '#00ffa3', range: '1.0 – 1.5 R⊕',
+    icon: '🌍', type: 'Earth-Sized Rocky World',
+    desc: 'About the same size as Earth — likely a rocky planet with a solid surface. This is the most exciting category for finding life! Scientists check whether it’s in the habitable zone (not too hot, not too cold) where liquid water could exist on the surface.',
+    color: '#00ffa3', range: '1.0 – 1.5 × Earth',
   };
   if (radius < 2.5) return {
-    icon: '🌏', type: 'Super-Earth Class',
-    desc: 'Super-Earth / mini-Neptune boundary. Below ~1.7 R⊕ likely rocky; above likely volatile-rich with H/He envelope. The Kepler radius gap (1.5–2 R⊕) caused by photoevaporation creates a natural division between these populations.',
-    color: '#7c6eff', range: '1.5 – 2.5 R⊕',
+    icon: '🌏', type: 'Super-Earth (Bigger Than Earth, Smaller Than Neptune)',
+    desc: 'Larger than Earth but smaller than Neptune. Planets below ~1.7× Earth are probably rocky. Larger ones likely have a thick gas atmosphere on top of a rocky core. There is nothing like this in our Solar System — it is one of the most common planet types in the galaxy!',
+    color: '#7c6eff', range: '1.5 – 2.5 × Earth',
   };
   if (radius < 6.0) return {
-    icon: '🔵', type: 'Neptune / Sub-Neptune Class',
-    desc: 'Ice or gas giant class dominant in Kepler detections. Transit + radial velocity gives mean density → water/ammonia ice envelope likely. Most abundant type in the 2–4 R⊕ range. TESS has found thousands of sub-Neptune candidates.',
-    color: '#b79fff', range: '2.5 – 6.0 R⊕',
+    icon: '🔵', type: 'Mini-Neptune (Ice or Gas Giant)',
+    desc: 'Similar in size to Neptune in our Solar System. These planets likely have a large atmosphere of hydrogen, helium, and water vapour surrounding a rocky or icy core. They are the most common type found by the Kepler telescope.',
+    color: '#b79fff', range: '2.5 – 6.0 × Earth',
   };
   if (radius < 15.0) return {
-    icon: '🪐', type: 'Gas Giant / Jupiter Class',
-    desc: 'Jupiter-class gas giant. Easiest to detect via transit method due to large radius ratio. Hot Jupiters (period < 10 days) were the first exoplanets discovered and remain critical test cases for planetary migration and formation models.',
-    color: '#ffd166', range: '6.0 – 15.0 R⊕',
+    icon: '🪐', type: 'Gas Giant (Jupiter-like)',
+    desc: 'A massive ball of gas similar to Jupiter or Saturn in our Solar System. These are the easiest planets to detect because they are so big. Ones orbiting very close to their star (called “Hot Jupiters”) were actually the first type of exoplanet ever discovered, back in the 1990s.',
+    color: '#ffd166', range: '6.0 – 15.0 × Earth',
   };
   return {
-    icon: '🔴', type: 'Super-Jupiter / Brown Dwarf Boundary',
-    desc: 'Super-Jupiter or near the planetary/stellar boundary (~13 M♃ = deuterium-burning limit). Mass confirmation via radial velocity is essential to distinguish a massive gas giant from a low-mass brown dwarf. Very rare in transit surveys.',
-    color: '#fb923c', range: '> 15.0 R⊕',
+    icon: '🔴', type: 'Super-Jupiter (At the Edge of Being a Star)',
+    desc: 'This is so large it sits right at the border between a massive planet and a “brown dwarf” — a failed star that was not quite massive enough to ignite nuclear fusion. Scientists would need to measure its mass directly to decide which category it truly belongs in.',
+    color: '#fb923c', range: '> 15.0 × Earth',
   };
 }
 
@@ -93,14 +93,14 @@ function PredictionResults({ data }) {
     <div className="results-wrap">
       {/* Classification */}
       <div className="card result-card">
-        <h3 className="rc-title">Task A — Classification</h3>
+        <h3 className="rc-title">Step 1 — Is it a Real Planet?</h3>
         <div className="verdict-wrap">
           <div className={`verdict ${isConfirmed ? 'confirmed' : 'false-positive'}`}>
             {isConfirmed ? '✨' : '❌'} {classification?.replace('_', ' ')}
           </div>
           <span className={`pulse-ring ${isConfirmed ? 'conf' : 'fp'}`} />
         </div>
-        <p className="rc-conf">Confidence: <strong>{(classification_confidence * 100).toFixed(1)}%</strong></p>
+        <p className="rc-conf">The AI is <strong>{(classification_confidence * 100).toFixed(1)}%</strong> confident in this result</p>
         <div className="conf-bar-wrap">
           <div className="conf-bar-track">
             <div
@@ -149,7 +149,7 @@ function PredictionResults({ data }) {
                   </div>
                 </div>
                 <p className="sc-desc">{fp.desc}</p>
-                <p className="sc-source">Classification source: NASA KOI BLENDER/PASTIS false-positive taxonomy</p>
+                <p className="sc-source">📚 Explained by NASA KOI false-positive research (BLENDER/PASTIS studies)</p>
               </div>
             );
           } else {
@@ -163,12 +163,11 @@ function PredictionResults({ data }) {
                   </div>
                 </div>
                 <p className="sc-desc">
-                  Model confidence exceeds {(classification_confidence * 100).toFixed(1)}% threshold. Transit signal
-                  consistent with a genuine planetary occultation. Signal-to-noise and orbital geometry
-                  parameters align with confirmed Kepler planet population. Recommend spectroscopic follow-up
-                  via HARPS or HIRES for radial velocity mass confirmation.
+                  The AI is {(classification_confidence * 100).toFixed(1)}% confident this signal is a genuine planet.
+                  The transit shape and timing match what real planets look like in Kepler data.
+                  Next step for astronomers would be a follow-up measurement to confirm the planet’s mass.
                 </p>
-                <p className="sc-source">Classification source: NASA KOI Cumulative Catalogue · GradientBoosting Classifier (ROC-AUC 97.6%)</p>
+                <p className="sc-source">📚 Based on NASA’s Kepler KOI Catalogue · AI trained on 9,564 real star systems (97.6% accuracy)</p>
               </div>
             );
           }
@@ -177,12 +176,12 @@ function PredictionResults({ data }) {
 
       {/* Regression */}
       <div className="card result-card">
-        <h3 className="rc-title">Task B — Radius Prediction</h3>
+        <h3 className="rc-title">Step 2 — How Big is the Planet?</h3>
         <div className="radius-display">
           <div className="radius-value">{predicted_radius?.toFixed(3)}</div>
-          <span className="radius-unit">R⊕</span>
+          <span className="radius-unit" title="R⊕ = Earth radii. 1 = same size as Earth. 11.2 = same size as Jupiter.">R⊕ (Earth radii)</span>
         </div>
-        <p className="rc-unc">±{radius_uncertainty?.toFixed(3)} R⊕ uncertainty</p>
+        <p className="rc-unc">±{radius_uncertainty?.toFixed(3)} Earth radii margin of error</p>
         <RadiusScale value={predicted_radius} />
 
         {/* ── Planet class context ── */}
@@ -206,7 +205,7 @@ function PredictionResults({ data }) {
       {/* Latency */}
       <div className="latency-pill">
         <span className="latency-dot" />
-        {latency_ms?.toFixed(0)} ms inference
+        Result ready in {latency_ms?.toFixed(0)} ms
       </div>
 
       {/* Habitable Zone + Exoplanet Similarity */}
@@ -229,6 +228,9 @@ function RadiusScale({ value }) {
 
   return (
     <div className="radius-scale">
+      <p style={{ fontSize: '0.72rem', color: '#6b7094', marginBottom: 4, marginTop: 0 }}>
+        Size compared to planets in our Solar System:
+      </p>
       <div className="rs-track">
         <div className="rs-fill" style={{ width: `${pct}%` }} />
         {markers.map((m) => (
