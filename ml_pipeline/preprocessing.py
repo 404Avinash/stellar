@@ -60,13 +60,28 @@ def validate_input(data: dict):
 def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     """Add derived columns that help the models."""
     out = df.copy()
+    # --- log transforms (reduce skew) ---
     out["log_period"]       = np.log1p(df["koi_period"])
     out["log_depth"]        = np.log1p(df["koi_depth"])
     out["log_duration"]     = np.log1p(df["koi_duration"])
     out["log_snr"]          = np.log1p(df["koi_model_snr"])
+    # --- ratio features ---
     out["period_dur_ratio"] = df["koi_period"] / (df["koi_duration"] + 1e-9)
     out["stellar_density"]  = df["koi_smass"] / (df["koi_srad"] ** 3 + 1e-9)
     out["depth_snr_ratio"]  = df["koi_depth"] / (df["koi_model_snr"] + 1e-9)
+    # --- physics-inspired features ---
+    # Fraction of the orbit spent in transit (real transits have tiny duty cycles)
+    out["transit_duty_cycle"] = df["koi_duration"] / (df["koi_period"] * 24.0 + 1e-9)
+    # Rough planetary radius proxy: R_p/R_* ≈ sqrt(depth_ppm / 1e6), then * R_*
+    out["radius_proxy"]     = np.sqrt(np.clip(df["koi_depth"], 0, None) / 1e6) * df["koi_srad"]
+    # Quadratic impact: grazing transits cluster at high b²
+    out["impact_sq"]        = df["koi_impact"] ** 2
+    # Interaction: long-period + high-SNR signals are more likely real planets
+    out["log_period_x_log_snr"] = np.log1p(df["koi_period"]) * np.log1p(df["koi_model_snr"])
+    # Equilibrium-temperature proxy: T_eq ∝ T_eff * sqrt(R_*) / sqrt(a) ∝ T_eff * sqrt(R_* / P)
+    out["equil_temp_proxy"] = df["koi_steff"] * np.sqrt(
+        df["koi_srad"] / (df["koi_period"] + 1e-9)
+    )
     return out
 
 
