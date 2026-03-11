@@ -179,8 +179,20 @@
   color: #6b7094;
 }
 
+/* ── Reload overlay ────────────────────── */
+.dq-reload-overlay {
+  position: absolute;
+  top: 8px; right: 12px;
+}
+.dq-spinner-sm {
+  width: 18px; height: 18px;
+  border-width: 2px;
+  margin: 0;
+}
+
 /* ── Filters ────────────────────────────── */
 .dq-filters {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 20px;
@@ -236,8 +248,25 @@
   margin-left: auto;
   font-size: .75rem;
   color: #6b7094;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 .dq-active-filter { color: #b79fff; }
+.dq-clear-btn {
+  background: rgba(255,95,126,.1);
+  border: 1px solid rgba(255,95,126,.3);
+  color: #ff7a96;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: .7rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Space Grotesk', sans-serif;
+  transition: all .18s;
+}
+.dq-clear-btn:hover { background: rgba(255,95,126,.22); border-color: #ff5f7e; }
 
 /* ── Sort Bar ───────────────────────────── */
 .dq-sort-bar {
@@ -342,6 +371,13 @@
 }
 
 .dq-card-info { flex: 1; min-width: 0; }
+.dq-koi-name {
+  font-size: .82rem;
+  font-weight: 800;
+  color: #c5baff;
+  font-family: 'Courier New', monospace;
+  letter-spacing: .04em;
+}
 .dq-card-topline {
   display: flex;
   align-items: center;
@@ -384,6 +420,32 @@
   color: #6b7094;
   font-style: italic;
 }
+/* ── Confidence bar ─────────────────────── */
+.dq-conf-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 5px;
+}
+.dq-conf-bar-track {
+  flex: 1;
+  max-width: 160px;
+  height: 5px;
+  background: rgba(255,255,255,.07);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.dq-conf-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width .4s ease;
+}
+.dq-conf-label {
+  font-size: .72rem;
+  font-weight: 700;
+  min-width: 38px;
+}
+
 .dq-card-stats {
   display: flex;
   gap: 12px;
@@ -593,6 +655,15 @@
   color: #6b7094;
   font-weight: 600;
 }
+
+/* ── Empty state ────────────────────────── */
+.dq-empty {
+  text-align: center;
+  padding: 50px 20px;
+  color: #6b7094;
+}
+.dq-empty-icon { font-size: 2.5rem; display: block; margin-bottom: 10px; }
+.dq-empty p { font-size: .9rem; margin: 0 0 14px; }
 
 /* ── Responsive ─────────────────────────── */
 @media (max-width: 700px) {

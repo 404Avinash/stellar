@@ -597,6 +597,8 @@ def discovery():
 
         obj = {
             "index": int(idx),
+            "kepoi_name": str(row["kepoi_name"]) if pd.notna(row.get("kepoi_name")) else f"KOI-{int(idx)}",
+            "kepid": int(row["kepid"]) if pd.notna(row.get("kepid")) else None,
             "koi_period": round(params["koi_period"], 4),
             "koi_depth": round(params["koi_depth"], 1),
             "koi_duration": round(params["koi_duration"], 3),

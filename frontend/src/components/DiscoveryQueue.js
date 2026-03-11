@@ -53,6 +53,7 @@ export default function DiscoveryQueue({ apiBase }) {
   const fetchDiscovery = useCallback(async () => {
     setLoading(true);
     setError(null);
+    setExpandedIdx(null);
     try {
       const params = new URLSearchParams({
         page: page.toString(),
@@ -101,7 +102,7 @@ export default function DiscoveryQueue({ apiBase }) {
         <div className="dq-loading">
           <div className="dq-spinner" />
           <p>Classifying 1,872 CANDIDATE KOIs &amp; generating mission assignments…</p>
-          <p className="dq-sub">Running GradientBoosting inference + role assignment engine</p>
+          <p className="dq-sub">Running Stacking Ensemble inference + role assignment engine</p>
         </div>
       </div>
     );
@@ -183,6 +184,7 @@ export default function DiscoveryQueue({ apiBase }) {
 
       {/* ── Filters Bar ─────────────────────────────────────── */}
       <div className="dq-filters">
+        {loading && <div className="dq-reload-overlay"><div className="dq-spinner dq-spinner-sm" /></div>}
         <div className="dq-filter-group">
           <label>Priority</label>
           <div className="dq-filter-pills">
@@ -213,6 +215,11 @@ export default function DiscoveryQueue({ apiBase }) {
           {roleFilter && <span className="dq-active-filter"> • {roleFilter}</span>}
           {priorityFilter && <span className="dq-active-filter"> • {priorityFilter} priority</span>}
           {hzOnly && <span className="dq-active-filter"> • HZ only</span>}
+          {(roleFilter || priorityFilter || hzOnly) && (
+            <button className="dq-clear-btn" onClick={() => {
+              setRoleFilter(''); setPriorityFilter(''); setHzOnly(false); setPage(1);
+            }}>✕ Clear filters</button>
+          )}
         </div>
       </div>
 
@@ -235,8 +242,15 @@ export default function DiscoveryQueue({ apiBase }) {
         ))}
       </div>
 
-      {/* ── Candidate Cards ─────────────────────────────────── */}
-      <div className="dq-candidates">
+      {/* ── Candidate Cards ─────────────────────────────────── */}      {data.data.length === 0 && (
+        <div className="dq-empty">
+          <span className="dq-empty-icon">🔭</span>
+          <p>No candidates match the current filters</p>
+          <button className="dq-retry-btn" onClick={() => {
+            setRoleFilter(''); setPriorityFilter(''); setHzOnly(false); setPage(1);
+          }}>Clear all filters</button>
+        </div>
+      )}      <div className="dq-candidates">
         {data.data.map((c, i) => (
           <div
             key={c.index}
@@ -252,12 +266,31 @@ export default function DiscoveryQueue({ apiBase }) {
               </div>
               <div className="dq-card-info">
                 <div className="dq-card-topline">
+                  <span className="dq-koi-name">{c.kepoi_name || `KOI-${c.index}`}</span>
                   <span className={`dq-pred-badge ${c.prediction === 'CONFIRMED' ? 'confirmed' : 'fp'}`}>
                     {c.prediction === 'CONFIRMED' ? '✓' : '✗'} {c.prediction}
                   </span>
-                  <span className="dq-conf">{(c.confirmation_probability * 100).toFixed(1)}%</span>
                   {c.in_habitable_zone && <span className="dq-hz-badge">🌍 HZ</span>}
                   <span className="dq-planet-class">{c.planet_class}</span>
+                </div>
+                <div className="dq-conf-bar-row">
+                  <div className="dq-conf-bar-track">
+                    <div className="dq-conf-bar-fill"
+                      style={{
+                        width: `${(c.confirmation_probability * 100).toFixed(0)}%`,
+                        background: c.confirmation_probability > 0.75
+                          ? 'linear-gradient(90deg,#00ffa355,#00ffa3)'
+                          : c.confirmation_probability > 0.5
+                          ? 'linear-gradient(90deg,#ffd16655,#ffd166)'
+                          : 'linear-gradient(90deg,#ff5f7e55,#ff5f7e)',
+                      }}
+                    />
+                  </div>
+                  <span className="dq-conf-label"
+                    style={{ color: c.confirmation_probability > 0.75 ? '#00ffa3'
+                                  : c.confirmation_probability > 0.5  ? '#ffd166' : '#ff5f7e' }}>
+                    {(c.confirmation_probability * 100).toFixed(1)}%
+                  </span>
                 </div>
                 <div className="dq-card-stats">
                   <span>P = {c.koi_period < 100 ? c.koi_period.toFixed(2) : c.koi_period.toFixed(0)}d</span>
