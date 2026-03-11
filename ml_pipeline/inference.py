@@ -15,6 +15,11 @@ _reg_q16    = None
 _reg_q84    = None
 
 
+def load_models():
+    """Eagerly load all models into memory. Call once at app startup."""
+    _load()
+
+
 def _load():
     global _classifier, _regressor, _reg_q16, _reg_q84
     clf_path  = os.path.join(MODELS_DIR, "classifier.pkl")

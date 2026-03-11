@@ -92,9 +92,24 @@ def _all_feature_names():
 ALL_FEATURES = _all_feature_names()
 
 
+# ── scaler cache (loaded once at import time) ─────────────────────
+_scaler = None
+
+def _get_scaler():
+    global _scaler
+    if _scaler is None:
+        scaler_path = os.path.join(MODELS_DIR, "scaler.pkl")
+        if not os.path.exists(scaler_path):
+            raise FileNotFoundError(
+                "Scaler not found. Run  python ml_pipeline/train.py  first."
+            )
+        _scaler = joblib.load(scaler_path)
+    return _scaler
+
+
 def preprocess_input(data: dict) -> np.ndarray:
     """
-    Validate -> DataFrame -> engineer -> scale with SAVED scaler.
+    Validate -> DataFrame -> engineer -> scale with CACHED scaler.
     Returns a 2-D numpy array of shape (1, n_features).
     """
     ok, errs = validate_input(data)
@@ -105,13 +120,7 @@ def preprocess_input(data: dict) -> np.ndarray:
     df = pd.DataFrame([row])
     df = engineer_features(df)[ALL_FEATURES]
 
-    scaler_path = os.path.join(MODELS_DIR, "scaler.pkl")
-    if not os.path.exists(scaler_path):
-        raise FileNotFoundError(
-            "Scaler not found. Run  python ml_pipeline/train.py  first."
-        )
-    scaler = joblib.load(scaler_path)
-    return scaler.transform(df)
+    return _get_scaler().transform(df)
 
 
 def prepare_training_data(csv_path: str):

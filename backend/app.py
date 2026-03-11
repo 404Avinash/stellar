@@ -18,7 +18,7 @@ import json
 import time
 
 from ml_pipeline.preprocessing import preprocess_input, validate_input, INPUT_FEATURES, VALID_RANGES
-from ml_pipeline.inference import predict_classification, predict_radius
+from ml_pipeline.inference import predict_classification, predict_radius, load_models
 
 # ── app setup ──────────────────────────────────────────────────────
 app = Flask(__name__)
@@ -59,6 +59,12 @@ class Prediction(db.Model):
 
 with app.app_context():
     db.create_all()
+
+# Eager-load all models + scaler at startup so the first request isn't slow
+try:
+    load_models()
+except FileNotFoundError:
+    pass  # models not yet trained — will raise gracefully at predict time
 
 
 # ── routes ─────────────────────────────────────────────────────────
