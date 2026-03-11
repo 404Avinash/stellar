@@ -6,6 +6,7 @@ import {
   AreaChart, Area,
 } from "recharts";
 import "./Statistics.css";
+import BatchAnalysis from "./BatchAnalysis";
 
 const C = {
   green: "#00ffa3", red: "#ff5f7e", purple: "#7c6eff",
@@ -71,7 +72,7 @@ function ModelPanel({ mm }) {
     <div className="card chart-card model-panel">
       <p className="chart-title">AI Model Performance</p>
       <div className="model-badges">
-        <span className="mbadge mbadge-gb">GradientBoosting</span>
+        <span className="mbadge mbadge-gb">Stacking Ensemble</span>
         <span className="mbadge mbadge-data">{mm?.training_samples?.toLocaleString()} samples</span>
         <span className="mbadge mbadge-feat">{mm?.total_features} features</span>
       </div>
@@ -378,7 +379,11 @@ export default function Statistics({ apiBase }) {
 
       {featImp.length > 0 && (
         <div className="card chart-card full">
-          <p className="chart-title">Top Feature Importance &#8212; GradientBoosting Classifier</p>
+          <p className="chart-title">Top Feature Importance &#8212; Ensemble Classifier (averaged)</p>
+          <p style={{ fontSize: '.78rem', color: '#6b7094', marginTop: '-6px', marginBottom: '14px' }}>
+            Transit depth and orbital period are the strongest predictive signals &mdash; confirming that
+            a planet&apos;s geometric footprint in the light curve is more diagnostic than host-star properties alone.
+          </p>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart layout="vertical" data={featImp}
               margin={{ top: 5, right: 40, left: 90, bottom: 5 }}>
@@ -402,6 +407,9 @@ export default function Statistics({ apiBase }) {
           </ResponsiveContainer>
         </div>
       )}
+
+      {/* ─── BATCH ANALYSIS ENGINE ─── */}
+      <BatchAnalysis apiBase={apiBase} />
     </div>
   );
 }

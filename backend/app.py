@@ -542,11 +542,8 @@ def discovery():
     min_score = int(request.args.get("min_score", 0))
 
     # ── Batch classify all candidates ──────────────────────────────
-    from ml_pipeline.preprocessing import engineer_features, ALL_FEATURES
-    import joblib
-
-    scaler_path = os.path.join(MODELS_DIR, "scaler.pkl")
-    scaler = joblib.load(scaler_path)
+    from ml_pipeline.preprocessing import engineer_features, ALL_FEATURES, _get_scaler
+    scaler = _get_scaler()
 
     # Ensure models are loaded
     from ml_pipeline.inference import _load, _classifier, _regressor
@@ -685,6 +682,138 @@ def discovery():
     }), 200
 
 
+@app.route("/api/batch-predict", methods=["POST"])
+def batch_predict():
+    """Accept up to 100 KOI parameter sets and return batch predictions + aggregate stats."""
+    import pandas as pd
+    import numpy as _np
+
+    body = request.get_json(force=True)
+    if not body or not isinstance(body, dict):
+        return jsonify({"error": "Provide JSON with a 'rows' array"}), 400
+
+    rows = body.get("rows", [])
+    if not isinstance(rows, list) or len(rows) == 0:
+        return jsonify({"error": "'rows' must be a non-empty array"}), 400
+    if len(rows) > 100:
+        return jsonify({"error": "Maximum 100 rows per batch request"}), 400
+
+    valid_rows, valid_indices, row_errors = [], [], []
+
+    for i, row in enumerate(rows):
+        if not isinstance(row, dict):
+            row_errors.append({"row": i, "error": "Row must be a JSON object"})
+            continue
+        cleaned = {}
+        ok = True
+        for f in INPUT_FEATURES:
+            raw = row.get(f)
+            if raw is None or raw == "":
+                row_errors.append({"row": i, "error": f"Missing field: {f}"})
+                ok = False
+                break
+            try:
+                cleaned[f] = float(raw)
+            except (ValueError, TypeError):
+                row_errors.append({"row": i, "error": f"{f} must be numeric"})
+                ok = False
+                break
+        if not ok:
+            continue
+        range_ok, range_errs = validate_input(cleaned)
+        if not range_ok:
+            row_errors.append({"row": i, "error": "; ".join(range_errs)})
+            continue
+        valid_rows.append(cleaned)
+        valid_indices.append(i)
+
+    if not valid_rows:
+        return jsonify({"error": "No valid rows to process", "row_errors": row_errors}), 400
+
+    # Batch preprocess
+    from ml_pipeline.preprocessing import engineer_features, ALL_FEATURES, _get_scaler
+    from ml_pipeline import inference as _inf
+
+    df       = pd.DataFrame(valid_rows)
+    X        = engineer_features(df[INPUT_FEATURES])[ALL_FEATURES]
+    X_scaled = _get_scaler().transform(X)
+
+    if _inf._classifier is None:
+        _inf._load()
+
+    cls_preds = _inf._classifier.predict(X_scaled)
+    cls_proba = _inf._classifier.predict_proba(X_scaled)
+    reg_preds = _inf._regressor.predict(X_scaled)
+
+    if _inf._reg_q16 is not None and _inf._reg_q84 is not None:
+        q16_preds = _inf._reg_q16.predict(X_scaled)
+        q84_preds = _inf._reg_q84.predict(X_scaled)
+    else:
+        q16_preds = reg_preds * 0.85
+        q84_preds = reg_preds * 1.15
+
+    results = []
+    for j, orig_idx in enumerate(valid_indices):
+        conf   = float(cls_proba[j][1])
+        radius = max(0.0, float(reg_preds[j]))
+        unc    = max(0.0, (float(q84_preds[j]) - float(q16_preds[j])) / 2.0)
+        label  = "CONFIRMED" if cls_preds[j] == 1 else "FALSE POSITIVE"
+        if   radius < 1:   pc = "Sub-Earth"
+        elif radius < 2:   pc = "Earth-size"
+        elif radius < 4:   pc = "Super-Earth"
+        elif radius < 8:   pc = "Neptune-size"
+        elif radius < 15:  pc = "Jupiter-size"
+        else:              pc = "Super-Jupiter"
+        results.append({
+            "row":               orig_idx,
+            "label":             label,
+            "confidence":        round(conf, 4),
+            "fp_probability":    round(float(cls_proba[j][0]), 4),
+            "predicted_radius":  round(radius, 4),
+            "radius_uncertainty": round(unc, 4),
+            "planet_class":      pc,
+            "input":             valid_rows[j],
+        })
+
+    results.sort(key=lambda x: x["row"])
+    confirmed_list = [r for r in results if r["label"] == "CONFIRMED"]
+    confs  = [r["confidence"] for r in results]
+    radii  = [r["predicted_radius"] for r in confirmed_list]
+
+    # Radius buckets
+    pc_counts = {}
+    for r in results:
+        pc_counts[r["planet_class"]] = pc_counts.get(r["planet_class"], 0) + 1
+    bucket_order  = ["Sub-Earth","Earth-size","Super-Earth","Neptune-size","Jupiter-size","Super-Jupiter"]
+    bucket_labels = {"Sub-Earth":"< 1 R\u2295","Earth-size":"1-2 R\u2295","Super-Earth":"2-4 R\u2295",
+                     "Neptune-size":"4-8 R\u2295","Jupiter-size":"8-15 R\u2295","Super-Jupiter":"> 15 R\u2295"}
+    radius_buckets = [
+        {"name": k, "label": bucket_labels[k], "count": pc_counts.get(k, 0)}
+        for k in bucket_order if pc_counts.get(k, 0) > 0
+    ]
+
+    # Confidence buckets
+    conf_ranges = [(0,.6,"<60%"),(.6,.7,"60-70%"),(.7,.8,"70-80%"),(.8,.9,"80-90%"),(.9,1.01,">90%")]
+    confidence_buckets = [
+        {"range": lbl, "count": sum(1 for c in confs if lo <= c < hi)}
+        for lo, hi, lbl in conf_ranges
+        if sum(1 for c in confs if lo <= c < hi) > 0
+    ]
+
+    return jsonify({
+        "total":              len(results),
+        "confirmed":          len(confirmed_list),
+        "false_positives":    len(results) - len(confirmed_list),
+        "confirm_rate":       round(len(confirmed_list) / len(results), 4),
+        "avg_confidence":     round(sum(confs) / len(confs), 4),
+        "avg_radius":         round(sum(radii) / len(radii), 4) if radii else 0.0,
+        "row_errors":         row_errors,
+        "results":            results,
+        "radius_buckets":     radius_buckets,
+        "confidence_buckets": confidence_buckets,
+    }), 200
+
+
 @app.route("/api/statistics", methods=["GET"])
 def statistics():
     from collections import defaultdict
@@ -740,18 +869,33 @@ def statistics():
     feature_importance = []
     try:
         import ml_pipeline.inference as _inf
+        import numpy as _np
         from ml_pipeline.preprocessing import ALL_FEATURES
         if _inf._classifier is None:
             _inf._load()
         clf_model = _inf._classifier
         if clf_model is not None:
-            pairs = sorted(zip(ALL_FEATURES, clf_model.feature_importances_),
-                           key=lambda x: x[1], reverse=True)
-            feature_importance = [
-                {"feature": f.replace("koi_", "").replace("_", " "),
-                 "importance": round(float(v) * 100, 2)}
-                for f, v in pairs[:10]
-            ]
+            # Direct model (e.g. single tree ensemble)
+            if hasattr(clf_model, 'feature_importances_'):
+                importances = clf_model.feature_importances_
+            elif hasattr(clf_model, 'named_estimators_'):
+                # StackingClassifier: average importances across tree-based base learners
+                tree_imps = [
+                    e.feature_importances_
+                    for e in clf_model.named_estimators_.values()
+                    if hasattr(e, 'feature_importances_')
+                ]
+                importances = _np.mean(tree_imps, axis=0) if tree_imps else None
+            else:
+                importances = None
+            if importances is not None:
+                pairs = sorted(zip(ALL_FEATURES, importances),
+                               key=lambda x: x[1], reverse=True)
+                feature_importance = [
+                    {"feature": f.replace("koi_", "").replace("_", " "),
+                     "importance": round(float(v) * 100, 2)}
+                    for f, v in pairs[:12]
+                ]
     except Exception:
         pass
 
@@ -769,20 +913,20 @@ def statistics():
         "feature_importance":   feature_importance,
         "model_metrics": {
             "classifier": {
-                "f1_score":  0.8995,
-                "roc_auc":   0.9758,
-                "accuracy":  0.9241,
-                "precision": 0.92,
+                "f1_score":  0.9004,
+                "roc_auc":   0.9747,
+                "accuracy":  0.9248,
+                "precision": 0.94,
                 "recall":    0.91,
             },
             "regressor": {
-                "r2_score": 0.9167,
-                "rmse":     0.9447,
-                "mae":      0.1800,
+                "r2_score": 0.8488,
+                "rmse":     1.2725,
+                "mae":      0.1527,
             },
             "training_samples": 7306,
-            "total_features":   17,
-            "dataset":          "NASA KOI Cumulative (9,564 objects)",
+            "total_features":   22,
+            "dataset":          "NASA KOI Cumulative (9,564 objects) · Stacking Ensemble",
         },
     }), 200
 

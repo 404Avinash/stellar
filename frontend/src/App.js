@@ -46,7 +46,7 @@ function App() {
           </h1>
           <p className="tagline">Exoplanet Classification &amp; Radius Prediction</p>
           <div className="header-badges">
-            <span className="hbadge hbadge-purple">GradientBoosting AI</span>
+            <span className="hbadge hbadge-purple">Stacking Ensemble AI</span>
             <span className="hbadge hbadge-green">6,128+ Confirmed in Archive</span>
             <span className="hbadge hbadge-blue">Kepler Q1-Q17 · 9,564 KOIs</span>
             <span className="hbadge hbadge-pink">ROC-AUC 97.6%</span>
