@@ -36,6 +36,16 @@ const C = {
 const RADIUS_COLORS = [C.blue, C.green, C.yellow, C.orange, C.red, C.pink];
 const PIE_COLORS    = [C.green, C.red];
 
+const RUNNER_STEPS = [
+  { label: 'Loading & validating your data',   desc: 'Checking 10 features per object for completeness',   duration: 350 },
+  { label: 'Engineering physics features',     desc: 'Computing 12 derived measurements from raw inputs',   duration: 500 },
+  { label: 'Running the AI stacking ensemble', desc: 'XGBoost + Random Forest + Extra Trees → meta-learner', duration: 880 },
+  { label: 'Predicting planet sizes',          desc: 'Estimating planetary radius (× Earth) per object',      duration: 420 },
+  { label: 'Calculating confidence bounds',    desc: 'Quantile regression for uncertainty (±) per object',   duration: 330 },
+  { label: 'Building your summary',            desc: 'Aggregating stats, charts & per-object table',        duration: 240 },
+];
+const RUNNER_TOTAL = RUNNER_STEPS.reduce((s, r) => s + r.duration, 0);
+
 function parseCSV(text) {
   const lines = text.trim().split('\n').filter(l => l.trim());
   if (lines.length < 2) return { error: 'CSV must have a header row + at least 1 data row.' };
@@ -99,13 +109,14 @@ const DarkTip = ({ active, payload, label }) => {
 export default function BatchAnalysis({ apiBase }) {
   const [rows,       setRows]       = useState(null);
   const [parseErr,   setParseErr]   = useState('');
-  const [loading,    setLoading]    = useState(false);
+  const [runner,     setRunner]     = useState(null); // null | { step: 0..N }
   const [result,     setResult]     = useState(null);
   const [apiError,   setApiError]   = useState('');
   const [dragging,   setDragging]   = useState(false);
   const [sortCol,    setSortCol]    = useState('row');
   const [sortDir,    setSortDir]    = useState('asc');
   const fileRef = useRef();
+  const runnerCancelRef = useRef(false);
 
   const applyFile = useCallback((file) => {
     if (!file) return;
@@ -130,14 +141,35 @@ export default function BatchAnalysis({ apiBase }) {
 
   const runAnalysis = async () => {
     if (!rows?.length) return;
-    setLoading(true); setApiError('');
+    setApiError(''); setResult(null);
+    runnerCancelRef.current = false;
+    setRunner({ step: 0 });
+
+    const delay = ms => new Promise(r => setTimeout(r, ms));
+
+    // Fire the real API call immediately — runs in parallel with animation
+    const apiPromise = axios.post(`${apiBase}/api/batch-predict`, { rows });
+
+    // Step animation — plays concurrently with the API call
+    const animPromise = (async () => {
+      for (let i = 0; i < RUNNER_STEPS.length; i++) {
+        if (runnerCancelRef.current) return;
+        setRunner({ step: i });
+        await delay(RUNNER_STEPS[i].duration);
+      }
+      if (!runnerCancelRef.current) setRunner({ step: RUNNER_STEPS.length });
+    })();
+
     try {
-      const res = await axios.post(`${apiBase}/api/batch-predict`, { rows });
+      // Wait for BOTH the animation AND the API to finish
+      const [, res] = await Promise.all([animPromise, apiPromise]);
+      await delay(500); // hold “all done” state briefly so user can see it
       setResult(res.data);
+      setRunner(null);
     } catch (err) {
+      runnerCancelRef.current = true;
+      setRunner(null);
       setApiError(err.response?.data?.error || 'Batch analysis failed — is the backend running?');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -217,15 +249,82 @@ export default function BatchAnalysis({ apiBase }) {
       <div className="ba-action-bar">
         <button className="ba-ghost-btn" onClick={loadSample}>🧪 Load 15 Sample Objects</button>
         <button
-          className={`ba-primary-btn${(!rows || loading) ? ' ba-btn-disabled' : ''}`}
+          className={`ba-primary-btn${(!rows || runner !== null) ? ' ba-btn-disabled' : ''}`}
           onClick={runAnalysis}
-          disabled={!rows || loading}
+          disabled={!rows || runner !== null}
         >
-          {loading
-            ? <><span className="ba-spinner" /> Analyzing…</>
+          {runner !== null
+            ? <><span className="ba-spinner" /> Running…</>
             : `⚡ Analyze ${rows?.length ?? 0} Object${rows?.length !== 1 ? 's' : ''}`}
         </button>
       </div>
+
+      {/* ── RUNNER PANEL ── */}
+      {runner !== null && (
+        <div className="ba-runner">
+          <div className="ba-runner-hd">
+            <span className="ba-runner-emoji">🔬</span>
+            <div>
+              <p className="ba-runner-title">
+                {runner.step >= RUNNER_STEPS.length
+                  ? '🎉 Analysis complete — loading your results…'
+                  : `Analysing ${rows?.length} object${rows?.length !== 1 ? 's' : ''}…`}
+              </p>
+              <p className="ba-runner-sub">
+                {runner.step < RUNNER_STEPS.length
+                  ? `Step ${runner.step + 1} of ${RUNNER_STEPS.length} · ${RUNNER_STEPS[runner.step]?.label}`
+                  : 'All steps complete'}
+              </p>
+            </div>
+          </div>
+
+          {/* Overall progress bar */}
+          <div className="ba-runner-pb-wrap">
+            <div
+              className="ba-runner-pb-fill"
+              style={{
+                width: `${
+                  runner.step >= RUNNER_STEPS.length
+                    ? 100
+                    : Math.round(
+                        RUNNER_STEPS.slice(0, runner.step).reduce((s, r) => s + r.duration, 0)
+                        / RUNNER_TOTAL * 100
+                      )
+                }%`,
+              }}
+            />
+          </div>
+
+          {/* Step list */}
+          <div className="ba-runner-steps">
+            {RUNNER_STEPS.map((s, i) => {
+              const done   = runner.step > i;
+              const active = runner.step === i;
+              return (
+                <div
+                  key={i}
+                  className={`ba-rs ${done ? 'ba-rs-done' : active ? 'ba-rs-active' : 'ba-rs-pending'}`}
+                >
+                  <span className="ba-rs-icon">
+                    {done
+                      ? '✓'
+                      : active
+                      ? <span className="ba-runner-spin" />
+                      : '○'}
+                  </span>
+                  <div className="ba-rs-body">
+                    <span className="ba-rs-label">{s.label}</span>
+                    {(done || active) && <span className="ba-rs-desc">{s.desc}</span>}
+                  </div>
+                  <span className="ba-rs-status">
+                    {done ? 'Done' : active ? 'Running…' : ''}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {apiError && <div className="ba-error-strip">{apiError}</div>}
 
