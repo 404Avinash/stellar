@@ -130,12 +130,37 @@
   font-size: .84rem;
 }
 
-/* ── action bar ──────────────────────────────── */
-.ba-action-bar {
+/* ── CTA section ─────────────────────────────── */
+.ba-cta-wrap {
   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+.ba-run-btn {
+  display: inline-flex;
   align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
+  gap: 8px;
+  padding: 13px 28px;
+  background: linear-gradient(135deg, #7c6eff, #5b46e8);
+  color: #fff;
+  font-size: .97rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: opacity .2s, transform .15s;
+  box-shadow: 0 4px 18px #7c6eff44;
+  letter-spacing: .01em;
+}
+.ba-run-btn:hover { opacity: .88; transform: translateY(-1px); }
+.ba-run-btn.ba-btn-disabled { opacity: .5; cursor: not-allowed; transform: none; }
+.ba-download-btn { margin-left: auto; }
+.ba-cta-hint {
+  font-size: .82rem;
+  color: #8b8fa8;
+  margin: 0;
+  line-height: 1.4;
 }
 
 /* ── spinner ─────────────────────────────────── */
