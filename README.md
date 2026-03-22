@@ -1,4 +1,4 @@
-# Stellar Verification Program - Exoplanet Prediction System
+# Stellar Verification Program - Exoplanet Prediction System.
 
 A comprehensive end-to-end machine learning system for classifying exoplanets and predicting planetary radius using Kepler Objects of Interest (KOI) data.
 
